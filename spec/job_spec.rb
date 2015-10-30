@@ -61,7 +61,7 @@ module Elected
           it 'returns false on exception' do
             subject.run { raise 'Some weird error' }
             expect(result).to eq false
-            expect_logger_line 'Elected::Scheduler::Job.rescue in execute | Exception: RuntimeError : Some weird error'
+            expect_logger_line 'Exception: RuntimeError : Some weird error'
           end
         end
       end
