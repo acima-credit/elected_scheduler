@@ -4,12 +4,11 @@ unless Object.const_defined? :SPEC_HELPER_LOADED
   require 'elected/scheduler'
   require 'timecop'
 
-  ENV['REDIS_URL'] ||= 'redis://localhost:6379/0'
-
-  DEFAULT_KEY     = 'test_elected_scheduler'
-  DEFAULT_TIMEOUT = 5_000
+  require_relative '../spec/support'
 
   RSpec.configure do |c|
+
+    c.include TestingHelpers
 
     # Setup defaults for testing
     c.before(:each) do
@@ -32,16 +31,21 @@ unless Object.const_defined? :SPEC_HELPER_LOADED
       Elected.senado.release
     end
 
-    def wait_until(time)
-      sleep 0.1 until Time.now >= time
+    # Get thread-safe line array
+    c.around(:example, loglines: true) do |example|
+      $lines = TestingHelpers::LogLines.new
+      example.run
+      $lines = nil
     end
 
-    def set_start_time
-      @start_time = Time.now
-    end
-
-    def wait_for_timeout(fraction)
-      wait_until @start_time + (@timeout / 1_000.0) * fraction
+    # Get an inspectable logger
+    c.around(:example, logging: true) do |example|
+      old_logger = Elected.logger
+      $logger = TestingHelpers::TestLogger.new
+      Elected.logger = $logger
+      example.run
+      Elected.logger = old_logger
+      $logger        = nil
     end
 
   end

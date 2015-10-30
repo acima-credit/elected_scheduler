@@ -1,14 +1,18 @@
 #!/usr/bin/env ruby
 
-require "bundler/setup"
-require "elected_scheduler"
+require 'bundler/setup'
+require 'elected_scheduler'
 
-# You can add fixtures and/or initialization code here to make experimenting
-# with your gem easier. You can also use a different console, if you like.
+require 'logger'
 
-# (If you use this, don't forget to add pry to your Gemfile!)
-# require "pry"
-# Pry.start
+E  = Elected
+S  = Elected::Scheduler
+J  = Elected::Scheduler::Job
+P  = Elected::Scheduler::Poller
+SC = Elected::Scheduler::Schedule
 
-require "irb"
-IRB.start
+require 'pry'
+ARGV.clear
+Pry.start
+
+
