@@ -1,4 +1,27 @@
-language: ruby
-rvm:
-  - 2.0.0
 before_install: gem install bundler -v 1.10.6
+
+language: ruby
+jdk:
+  - oraclejdk8
+rvm:
+  - ruby-2.0.0-p598
+  - ruby-2.2.0
+  - jruby-9.0.0.0
+  - jruby-head
+services:
+  - redis-server
+env:
+  global:
+    - REDIS_URL="redis://localhost:6379/0"
+    - JRUBY_OPTS="--server -J-Dfile.encoding=utf8 --2.0"
+install:
+  - bundle install --jobs=3 --retry=3
+script:
+  - bundle exec rspec
+notifications:
+  email:
+    recipients:
+      - aemadrid@gmail.com
+    on_success: change
+    on_failure: change
+sudo: false
