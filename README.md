@@ -1,3 +1,8 @@
+[![Build Status](https://travis-ci.org/simple-finance/elected_scheduler.svg?branch=master)](https://travis-ci.org/simple-finance/elected_scheduler)
+[![Code Climate](https://codeclimate.com/github/simple-finance/elected_scheduler/badges/gpa.svg)](https://codeclimate.com/github/simple-finance/elected_scheduler)
+[![security](https://hakiri.io/github/simple-finance/elected_scheduler/master.svg)](https://hakiri.io/github/simple-finance/elected_scheduler/master)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/simple-finance/elected_scheduler?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+
 # ElectedScheduler - A ruby distributed cron-like scheduler that only runs jobs on leader processes.
 
 > Schedule your jobs at cron-like times (seconds included) and run the jobs only if the process is the current leader.
