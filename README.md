@@ -1,5 +1,7 @@
 # ElectedScheduler - A ruby distributed cron-like scheduler that only runs jobs on leader processes.
 
+[![Join the chat at https://gitter.im/simple-finance/elected_scheduler](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/simple-finance/elected_scheduler?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 > Schedule your jobs at cron-like times (seconds included) and run the jobs only if the process is the current leader.
 > 
 > This gem depends on the [elected](https://github.com/simple-finance/elected) ruby gem to select a leader and 
