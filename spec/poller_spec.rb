@@ -27,7 +27,8 @@ module Elected
           subject << Job.new('even') { $lines << 'even' }.at(seconds: 30.times.map { |x| x * 2 })
           subject << Job.new('odd') { $lines << 'odd' }.at(seconds: 30.times.map { |x| x * 2 + 1 })
 
-          Timecop.travel mk_time(sc: 59)
+          wait_until { subject.leader? }
+
           subject.start
           expect(subject.status).to eq :running
 

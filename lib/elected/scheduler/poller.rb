@@ -58,6 +58,10 @@ module Elected
         @status
       end
 
+      def leader?
+        senado.leader?
+      end
+
       def to_s
         %{#<#{self.class.name} key="#{key}" timeout="#{timeout}" jobs=#{jobs.size}>}
       end

@@ -116,6 +116,11 @@ module TestingHelpers
     @start_time = Time.now
   end
 
+  def wait_until(timeout = 30)
+    deadline = Time.now + timeout
+    sleep 0.25 until yield || Time.now >= deadline
+  end
+
   def wait_for_timeout(fraction)
     wait_until @start_time + (@timeout / 1_000.0) * fraction
   end
