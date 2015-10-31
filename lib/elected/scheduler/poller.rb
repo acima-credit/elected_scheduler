@@ -26,16 +26,8 @@ module Elected
         @status ||= :stopped
       end
 
-      def starting?
-        status == :starting
-      end
-
       def running?
         status == :running
-      end
-
-      def stopping?
-        status == :stopping
       end
 
       def stopped?
@@ -43,10 +35,8 @@ module Elected
       end
 
       def start
-        unless stopped?
-          debug "cannot start on #{status} ..."
-          return false
-        end
+        return false unless stopped?
+        raise 'No jobs to run!' if jobs.empty?
 
         debug "#{label} starting ..."
         @status = :starting
@@ -54,19 +44,15 @@ module Elected
         @status = :running
         debug "#{label} running poller!"
         @status
-      rescue Exception => e
-        error "#{label} Exception thrown: #{e.class.name} : #{e.message}\n  #{e.backtrace[0, 5].join("\n  ")}"
       end
 
       def stop
-        unless running?
-          warn "cannot stop on #{status} ..."
-          return false
-        end
+        return false unless running?
 
         debug "#{label} stopping poller ..."
         @status = :stopping
         stop_polling_loop
+        senado.release
         @status = :stopped
         debug "#{label} stopped poller!"
         @status
@@ -85,11 +71,7 @@ module Elected
       def start_polling_loop
         debug 'starting process loop ...'
         @polling_loop_thread = Thread.new do
-          begin
-            poll_and_process_loop
-          rescue Exception => e
-            error "Exception: #{e.class.name} : #{e.message}\n  #{e.backtrace[0, 10].join("\n  ")}"
-          end
+          poll_and_process_loop
         end
       end
 
@@ -97,21 +79,19 @@ module Elected
         cnt = 0
         while running?
           cnt += 1
-          begin
-            debug "#{label(cnt)} calling poll_and_process_jobs while running?:#{running?} ..."
-            poll_and_process_jobs
-          rescue Exception => e
-            error "#{label(cnt)} Exception: #{e.class.name} : #{e.message}\n  #{e.backtrace[0, 5].join("\n  ")}"
-          end
+          debug "#{label(cnt)} calling poll_and_process_jobs while running?:#{running?} ..."
+          poll_and_process_jobs
           sleep_until_next_tick
         end
       end
 
       def poll_and_process_jobs
         if senado.leader?
+          debug "#{label} leader, processing jobs ..."
           start_time = Time.now
           jobs.values.each { |job| process_job job, start_time }
         else
+          debug "#{label} not a leader, sleeping ..."
           sleep_for_slave
         end
       end
@@ -147,8 +127,18 @@ module Elected
 
     extend self
 
+    attr_writer :key, :timeout
+
+    def key
+      @key || 'elected_scheduler_poller'
+    end
+
+    def timeout
+      @timeout || Elected.timeout
+    end
+
     def poller
-      @poller ||= Poller.new
+      @poller ||= Poller.new key, timeout
     end
   end
 end

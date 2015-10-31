@@ -18,26 +18,34 @@ module Elected
           expect(subject.jobs.keys).to eq %w{ a b }
         end
       end
-      context 'flow', loglines: true do
+      context 'flow', loglines: true, focus: true do
+        it 'cannot start on empty jobs' do
+          expect { subject.start }.to raise_exception RuntimeError, 'No jobs to run!'
+        end
         it 'starts, runs on time and stops' do
           expect(subject.status).to eq :stopped
-          subject << Job.new('a') { $lines << 'a' }.at(seconds: [0, 2, 4, 6, 8])
-          subject << Job.new('b') { $lines << 'b' }.at(seconds: [1, 3, 5, 7, 9])
+          subject << Job.new('even') { $lines << 'even' }.at(seconds: 30.times.map { |x| x * 2 })
+          subject << Job.new('odd') { $lines << 'odd' }.at(seconds: 30.times.map { |x| x * 2 + 1 })
 
           Timecop.travel mk_time(sc: 59)
           subject.start
           expect(subject.status).to eq :running
 
-          $lines.wait_for_size 5
+          $lines.wait_for_size 6, 10
           subject.stop
           expect(subject.status).to eq :stopped
 
-          expect($lines.all).to eq %w{ a b a b a }
+          expect($lines.sorted).to eq %w{ even even even odd odd odd }
         end
       end
       context '#to_s' do
         it('simple') { expect(subject.to_s).to eq %{#<Elected::Scheduler::Poller key="#{key}" timeout="#{timeout}" jobs=0>} }
       end
+    end
+  end
+  describe Scheduler do
+    it 'has a default poller' do
+      expect(described_class.poller).to be_a Scheduler::Poller
     end
   end
 end

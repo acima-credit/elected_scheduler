@@ -10,6 +10,10 @@ unless Object.const_defined? :SPEC_HELPER_LOADED
 
     c.include TestingHelpers
 
+    c.filter_run focus: true if FOCUSED
+    c.filter_run_excluding performance: true unless PERFORMANCE
+    Elected.logger.level = Logger::DEBUG if DEBUG
+
     # Setup defaults for testing
     c.before(:each) do
       Elected.key        = DEFAULT_KEY
@@ -27,10 +31,6 @@ unless Object.const_defined? :SPEC_HELPER_LOADED
       Timecop.return
     end
 
-    c.after(:each) do
-      Elected.senado.release
-    end
-
     # Get thread-safe line array
     c.around(:example, loglines: true) do |example|
       $lines = TestingHelpers::LogLines.new
@@ -40,8 +40,8 @@ unless Object.const_defined? :SPEC_HELPER_LOADED
 
     # Get an inspectable logger
     c.around(:example, logging: true) do |example|
-      old_logger = Elected.logger
-      $logger = TestingHelpers::TestLogger.new
+      old_logger     = Elected.logger
+      $logger        = TestingHelpers::TestLogger.new
       Elected.logger = $logger
       example.run
       Elected.logger = old_logger

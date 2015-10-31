@@ -2,10 +2,10 @@ require 'spec_helper'
 
 module Elected
   module Scheduler
-    describe Schedule do
+    describe Schedule, focus: true do
+      let(:options) { {} }
       subject { described_class.new options }
       context 'default' do
-        let(:options) { {} }
         it 'can be instantiated' do
           expect(subject).to be_a described_class
         end

@@ -7,6 +7,10 @@ ENV['REDIS_URL'] ||= 'redis://localhost:6379/0'
 DEFAULT_KEY     = 'test_elected_scheduler'
 DEFAULT_TIMEOUT = 5_000
 
+FOCUSED     = ENV['FOCUS'] == 'true'
+PERFORMANCE = ENV['PERFORMANCE'] == 'true'
+DEBUG       = ENV['DEBUG'] == 'true'
+
 module TestingHelpers
 
   extend RSpec::Core::SharedContext
@@ -30,6 +34,7 @@ module TestingHelpers
     end
 
     def add(msg)
+      debug 'add | %s' % msg
       @all << msg
     end
 
@@ -158,8 +163,8 @@ module TestingHelpers
 
   def expect_line(msg)
     expect($lines.has_line?(msg)).to eq(true),
-                                      "expected #{$logger.lines.inspect}\n" +
-                                        "to have  [#{msg}]"
+                                     "expected #{$logger.lines.inspect}\n" +
+                                       "to have  [#{msg}]"
 
   end
 
