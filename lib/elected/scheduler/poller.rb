@@ -5,7 +5,7 @@ module Elected
       include Logging
       extend Forwardable
 
-      attr_reader :key, :jobs
+      attr_reader :key, :jobs, :stats
 
       def_delegators :@senado, :timeout
 
@@ -13,6 +13,7 @@ module Elected
         @senado ||= Senado.new key, timeout
         @key    = key
         @jobs   = Concurrent::Hash.new
+        @stats  = Stats.new :processed_job, :no_match, :sleep_slave
       end
 
       def add(job)
@@ -96,14 +97,19 @@ module Elected
           jobs.values.each { |job| process_job job, start_time }
         else
           debug "#{label} not a leader, sleeping ..."
+          @stats.increment :sleep_slave
           sleep_for_slave
         end
       end
 
       def process_job(job, time)
-        return false unless job.matches? time
+        unless job.matches? time
+          @stats.increment :no_match
+          return false
+        end
 
         Concurrent::Future.execute { job.execute }
+        @stats.increment :processed_job
       end
 
       def stop_polling_loop
