@@ -5,9 +5,10 @@ module Elected
       include Logging
       extend Forwardable
 
-      attr_reader :key, :jobs, :stats
+      attr_accessor :key
+      attr_reader :jobs, :stats
 
-      def_delegators :@senado, :timeout
+      def_delegators :@senado, :timeout, :timeout=
 
       def initialize(key, timeout = nil)
         @senado ||= Senado.new key, timeout

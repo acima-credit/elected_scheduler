@@ -12,6 +12,14 @@ module Elected
         expect(subject.timeout).to eq timeout
         expect(subject.jobs).to be_empty
       end
+      it 'can change key' do
+        subject.key = 'some_other_key'
+        expect(subject.key).to eq 'some_other_key'
+      end
+      it 'can change timeout' do
+        subject.timeout = 1_234
+        expect(subject.timeout).to eq 1_234
+      end
       it 'has stats' do
         expect(subject.stats.to_s).to eq '#<Elected::Stats no_match=0 processed_job=0 sleep_slave=0>'
       end
