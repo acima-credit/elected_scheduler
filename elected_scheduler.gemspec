@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'elected', '~> 0.2.3'
+  spec.add_dependency 'elected', '~> 0.2.4'
   spec.add_dependency 'concurrent-ruby', '~> 1.0.0'
   spec.add_dependency 'concurrent-ruby-edge', '~> 0.2.0'
   spec.add_dependency 'pry'
